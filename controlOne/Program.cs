@@ -65,10 +65,12 @@ namespace controlOne
             Console.WriteLine($" Most populated:{nameMostPop} ({mostPop} people)");
             Console.WriteLine($" Longest name:{nameLongName} ({lenghtName} letters)");
             Console.WriteLine($" Density:");
+            double tempValue = 0.00;
 
             foreach (var s in cities)
             {
-                Console.WriteLine($"         {s.Name} - {s.Population/s.Dencity}");
+                tempValue = Convert.ToDouble(s.Population) / Convert.ToDouble(s.Dencity);
+                Console.WriteLine($"         {s.Name} - {tempValue.ToString().Substring(0,4)}");
             }
 
 
