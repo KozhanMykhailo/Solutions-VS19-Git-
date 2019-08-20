@@ -18,6 +18,7 @@ namespace controlOne
         static void Main(string[] args)
         {
 
+
             Console.WriteLine($"Input data\n");
             var userInput = Console.ReadLine();
 
@@ -26,7 +27,7 @@ namespace controlOne
 
             City[] cities = new City[countArrayCity];
 
-            for(int i =0; i<arrayCity.Length;i++)
+            for (int i = 0; i < arrayCity.Length; i++)
             {
                 string[] name = arrayCity[i].Split('=');
                 string[] popden = name[1].Split(',');
@@ -37,7 +38,41 @@ namespace controlOne
 
             }
 
-            Console.WriteLine($"{cities[0].Name}  {cities[0].Population}\n");
+            int mostPop = 0;
+            string nameMostPop = "";
+
+            foreach (var s in cities)
+            {                
+                if (mostPop < s.Population)
+                {
+                    mostPop = s.Population;
+                    nameMostPop = s.Name;
+                }
+            }
+
+            string nameLongName = "";
+            int lenghtName = 0;
+
+            foreach (var s in cities)
+            {
+                if (lenghtName < s.Name.Length)
+                {
+                    nameLongName = s.Name;
+                    lenghtName = s.Name.Length;
+                }
+            }
+
+            Console.WriteLine($" Most populated:{nameMostPop} ({mostPop} people)");
+            Console.WriteLine($" Longest name:{nameLongName} ({lenghtName} letters)");
+            Console.WriteLine($" Density:");
+
+            foreach (var s in cities)
+            {
+                Console.WriteLine($"         {s.Name} - {s.Population/s.Dencity}");
+            }
+
+
+            // Console.WriteLine($"{mostPop}  {nameMostPop}\n");
             Console.ReadLine();
         }
 
