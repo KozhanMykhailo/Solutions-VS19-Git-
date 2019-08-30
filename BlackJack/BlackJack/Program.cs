@@ -12,7 +12,6 @@ namespace BlackJack
         public string Suit;
         public int Value;
     }
-
     struct Players
     {
         private string Name { get; set; }
@@ -35,28 +34,35 @@ namespace BlackJack
         {
             return Point.ToString();
         }
-
+        public void GetNameWinner()
+        {
+            Console.WriteLine($"{Name} WIN!!!");
+        }
+        public void GetCardRecipient()
+        {
+            Console.WriteLine($"{Name} gets:");
+        }
     }
-
     class Program
     {
         static void Main(string[] args)
         {
-            Cards[] cards = Deck();
+            Program p = new Program();
+            Cards[] cards = p.Deck();
             Players human = new Players("Player", 0);
             Players ai = new Players("Bot Vanya", 0);
 
             bool restart;
             do
             {
-                DeckMixed(cards);
+                p.DeckMixed(cards);
                 Console.Clear();
                 int playerCardValue = 0;
                 int aiCardValue = 0; // ----- ai == AI(Иску́сственный интелле́кт)
 
                 Console.WriteLine("The deck is ready!\n");
 
-                var firstPlayer = WhoGoesFirst() % 2 == 0;
+                var firstPlayer = p.WhoGoesFirst() % 2 == 0;
                 if (firstPlayer)
                 {
                     Console.WriteLine("The first player to receive a card (YOU)"); //Первым получает карты Игрок(ТЫ)
@@ -73,57 +79,52 @@ namespace BlackJack
                 int lastIndex = 0;
                 if (firstPlayer)
                 {
-                    for (int indexCardHuman = 0; indexCardHuman < 2; indexCardHuman++)
+                    for (int indexCard = 0; indexCard < 2; indexCard++)
                     {
-                        Console.WriteLine($"Players gets:");
-                        PrintInfoCard(cards, indexCardHuman);
-                        lastIndex = indexCardHuman;
-                        playerCardValue += cards[indexCardHuman].Value;
+                        human.GetCardRecipient();
+                        var newValueP = p.AddCard(cards, indexCard, out lastIndex);
+                        playerCardValue += newValueP;
                     }
-                    for (int indexCardAI = 2; indexCardAI < 4; indexCardAI++)
+                    for (int indexCard = 2; indexCard < 4; indexCard++)
                     {
-                        Console.WriteLine($"AI gets:");
-                        PrintInfoCard(cards, indexCardAI);
-                        lastIndex = indexCardAI;
-                        aiCardValue += cards[indexCardAI].Value;
+                        ai.GetCardRecipient();
+                        var newValueAI = p.AddCard(cards, indexCard, out lastIndex);
+                        aiCardValue += newValueAI;
                     }
-
                 }
                 else
                 {
-                    for (int indexCardAI = 0; indexCardAI < 2; indexCardAI++)
+                    for (int indexCard = 0; indexCard < 2; indexCard++)
                     {
-                        Console.WriteLine($"AI gets:");
-                        PrintInfoCard(cards, indexCardAI);
-                        lastIndex = indexCardAI;
-                        aiCardValue += cards[indexCardAI].Value;
+                        ai.GetCardRecipient();
+                        var newValueAI = p.AddCard(cards, indexCard, out lastIndex);
+                        aiCardValue += newValueAI;
                     }
-                    for (int indexCardHuman = 2; indexCardHuman < 4; indexCardHuman++)
+                    for (int indexCard = 2; indexCard < 4; indexCard++)
                     {
-                        Console.WriteLine($"Players gets:");
-                        PrintInfoCard(cards, indexCardHuman);
-                        lastIndex = indexCardHuman;
-                        playerCardValue += cards[indexCardHuman].Value;
+                        human.GetCardRecipient();
+                        var newValueP = p.AddCard(cards, indexCard, out lastIndex);
+                        playerCardValue += newValueP;
                     }
                 }
 
-                Console.WriteLine($"Summa Player : {playerCardValue}");
-                Console.WriteLine($"Summa AI : {aiCardValue}\n");
+                Console.WriteLine($"Summa {human.GetName()} : {playerCardValue}");
+                Console.WriteLine($"Summa {ai.GetName()} : {aiCardValue}\n");
 
                 if (playerCardValue == 22 || playerCardValue == 21)
                 {
-                    Console.WriteLine($"Players WIN , him score = {playerCardValue}\n");
+                    Console.WriteLine($"{human.GetName()} WIN , him score = {playerCardValue}\n");
                     Console.WriteLine($"END GAME\n");
                     human.UpdatePoint();
-                    restart = RestartGame();
+                    restart = p.RestartGame();
                     continue;
                 }
                 else if (aiCardValue == 22 || aiCardValue == 21)
                 {
-                    Console.WriteLine($"AI WIN , him score = {aiCardValue}\n");
+                    Console.WriteLine($"{ai.GetName()} WIN , him score = {aiCardValue}\n");
                     Console.WriteLine($"END GAME\n");
                     ai.UpdatePoint();
-                    restart = RestartGame();
+                    restart = p.RestartGame();
                     continue;
                 }
                 else
@@ -132,7 +133,6 @@ namespace BlackJack
                 }
 
                 //Начинаем спрашивать не хотят ли игроки взять дополнительные карты 
-
                 bool answerPlayer = true;
                 bool answerAI = true;
 
@@ -143,24 +143,20 @@ namespace BlackJack
                     {
                         if (answerPlayer && Question())
                         {
-                            var newCardIndex = AddCard(lastIndex);
-                            playerCardValue += cards[newCardIndex].Value;
-                            lastIndex++;
-                            Console.WriteLine($"Players gets:\n");
-                            PrintInfoCard(cards, lastIndex);
+                            human.GetCardRecipient();
+                            var newValueAI = p.AddCard(cards, lastIndex, out lastIndex);
+                            playerCardValue += newValueAI;
                         }
                         else
                         {
                             answerPlayer = false;
                         }
 
-                        if (answerAI && Question(aiCardValue))
+                        if (answerAI && p.Question(aiCardValue))
                         {
-                            var newCardIndex = AddCard(lastIndex);
-                            Console.WriteLine("AI took a card\n");
-                            aiCardValue += cards[newCardIndex].Value;
-                            lastIndex++;
-                            PrintInfoCard(cards, lastIndex);
+                            ai.GetCardRecipient();
+                            var newValueAI = p.AddCard(cards, lastIndex, out lastIndex);
+                            aiCardValue += newValueAI;
                         }
                         else
                         {
@@ -169,13 +165,11 @@ namespace BlackJack
                     }
                     else
                     {
-                        if (answerAI && Question(aiCardValue))
+                        if (answerAI && p.Question(aiCardValue))
                         {
-                            var newCardIndex = AddCard(lastIndex);
-                            Console.WriteLine("AI took a card\n");
-                            aiCardValue += cards[newCardIndex].Value;
-                            lastIndex++;
-                            PrintInfoCard(cards, lastIndex);
+                            ai.GetCardRecipient();
+                            var newValueAI = p.AddCard(cards, lastIndex, out lastIndex);
+                            aiCardValue += newValueAI;
                         }
                         else
                         {
@@ -184,21 +178,17 @@ namespace BlackJack
 
                         if (answerPlayer && Question())
                         {
-                            var newCardIndex = AddCard(lastIndex);
-                            playerCardValue += cards[newCardIndex].Value;
-                            lastIndex++;
-                            Console.WriteLine($"Players gets:\n");
-                            PrintInfoCard(cards, lastIndex);
+                            human.GetCardRecipient();
+                            var newValueAI = p.AddCard(cards, lastIndex, out lastIndex);
+                            playerCardValue += newValueAI;
                         }
                         else
                         {
                             answerPlayer = false;
                         }
-
                     }
-
-                    Console.WriteLine($"Summa Player : {playerCardValue}");
-                    Console.WriteLine($"Summa AI : {aiCardValue}\n");
+                    Console.WriteLine($"Summa {human.GetName()} : {playerCardValue}");
+                    Console.WriteLine($"Summa {ai.GetName()} : {aiCardValue}\n");
                 }
                 while ((answerPlayer || answerAI) && (playerCardValue < 21 && aiCardValue < 21));
 
@@ -210,24 +200,24 @@ namespace BlackJack
                 }
                 else if (aiCardValue > 21 && playerCardValue < 21)
                 {
-                    Console.WriteLine($"Players WIN!!!");
+                    human.GetNameWinner();
                     human.UpdatePoint();
                 }
                 else if (playerCardValue > 21 && aiCardValue < 21)
                 {
-                    Console.WriteLine($"AI WIN!!!");
+                    ai.GetNameWinner();
                     ai.UpdatePoint();
                 }
                 else if (playerCardValue > 21 && aiCardValue > 21)
                 {
                     if (playerCardValue < aiCardValue)
                     {
-                        Console.WriteLine($"Players WIN!!!");
+                        human.GetNameWinner();
                         human.UpdatePoint();
                     }
                     else
                     {
-                        Console.WriteLine($"AI WIN!!!");
+                        ai.GetNameWinner();
                         ai.UpdatePoint();
                     }
                 }
@@ -235,24 +225,23 @@ namespace BlackJack
                 {
                     if (playerCardValue > aiCardValue)
                     {
-                        Console.WriteLine($"Players WIN!!!");
+                        human.GetNameWinner();
                         human.UpdatePoint();
                     }
                     else
                     {
-                        Console.WriteLine($"AI WIN!!!");
+                        ai.GetNameWinner();
                         ai.UpdatePoint();
                     }
                 }
                 Console.WriteLine($"END GAME\n");
-                restart = RestartGame();
+                restart = p.RestartGame();
             }
             while (restart);
             Console.WriteLine($"{human.GetName()} wins : {human.GetPoint()}\n{ai.GetName()} wins : {ai.GetPoint()}");
             Console.ReadLine();
         }
-
-        static int WhoGoesFirst()
+        private int WhoGoesFirst()
         {
             Random random = new Random();
             return random.Next(1, 100);
@@ -275,7 +264,7 @@ namespace BlackJack
                 return Question();
             }
         }
-        static bool Question(int aiCardValue)
+        private bool Question(int aiCardValue)
         {
             if (aiCardValue < 19)
             {
@@ -286,12 +275,7 @@ namespace BlackJack
                 return false;
             }
         }
-        static int AddCard(int indexLast)
-        {
-            var nextcard = ++indexLast;
-            return nextcard;
-        }
-        static bool RestartGame()
+        private bool RestartGame()
         {
             Console.WriteLine($"Do you want to start a new game?(Yes / No)");
             var temp = Console.ReadLine().ToLower();
@@ -311,7 +295,7 @@ namespace BlackJack
 
         }
 
-        static Cards[] Deck()
+        private Cards[] Deck()
         {
             Cards[] cards = new Cards[36];
             int index = 0;
@@ -325,12 +309,12 @@ namespace BlackJack
                         cards[index].Name = c.ToString();
                         cards[index].Value = Convert.ToInt32(c);
                         index++;
-                    }                   
+                    }
                 }
-            }           
+            }
             return cards;
         }
-        static Cards[] DeckMixed(Cards[] de)
+        private Cards[] DeckMixed(Cards[] de)
         {
             Random rand = new Random();
 
@@ -346,11 +330,19 @@ namespace BlackJack
             return de;
         }
 
-        static void PrintInfoCard(Cards[] cards, int i)
+        private void PrintInfoCard(Cards[] cards, int i)
         {
             Console.WriteLine($"{cards[i].Name} , {cards[i].Suit} = {cards[i].Value} \n ");
         }
 
+        private int AddCard(Cards[] c, int indexOld, out int lastIndex)
+        {
+            Program p = new Program();
+            p.PrintInfoCard(c, indexOld);
+            int cardValue = c[indexOld].Value;
+            lastIndex = ++indexOld;
+            return cardValue;
+        }
     }
     enum Card
     {
@@ -370,10 +362,5 @@ namespace BlackJack
         Clubs = 1,
         Hearts = 2,
         Spedes = 3
-
-
     }
-
-
-
 }
