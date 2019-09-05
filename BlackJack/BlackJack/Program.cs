@@ -6,52 +6,52 @@ using System.Threading.Tasks;
 
 namespace BlackJack
 {
-    struct Cards
+    struct Deck
     {
-        public string Name;
-        public string Suit;
+        public Card Name;
+        public Suits Suit;
         public int Value;
 
-        public Cards[] Deck()
+        public Deck[] InitializationDeck()
         {
-            Cards[] cards = new Cards[36];
+            Deck[] cards = new Deck[36];
             int index = 0;
             foreach (Suits s in Enum.GetValues(typeof(Suits)))
             {
                 foreach (Card c in Enum.GetValues(typeof(Card)))
                 {
-                    cards[index].Suit = s.ToString();
-                    cards[index].Name = c.ToString();
-                    cards[index].Value = Convert.ToInt32(c);
+                    cards[index].Suit = s;
+                    cards[index].Name = c;
+                    cards[index].Value = (int)c;
                     index++;
                 }
             }
             return cards;
         }
 
-        public void DeckMixed(Cards[] de)
+        public void DeckMixed(Deck[] de)
         {
             Random rand = new Random();
             for (int i = de.Length - 1; i >= 1; i--)
             {
                 int j = rand.Next(i + 1);
-                Cards tmp = de[j];
+                Deck tmp = de[j];
                 de[j] = de[i];
                 de[i] = tmp;
             }
         }
-        public void PrintInfoCard(Cards[] cards, int i)
+        public void PrintInfoCard(Deck[] cards, int i)
         {
             Console.WriteLine($"{cards[i].Name} , {cards[i].Suit} = {cards[i].Value} \n ");
         }
-        public int AddCard(Cards[] c, int indexOld, out int lastIndexCard)
+        public int AddCard(Deck[] c, int indexOld, out int lastIndexCard)
         {
             PrintInfoCard(c, indexOld);
             int cardValue = c[indexOld].Value;
             lastIndexCard = ++indexOld;
             return cardValue;
         }
-        public int GiveTwoCard(Cards[] c, int indexOld, out int lastIndexCard)
+        public int GiveTwoCard(Deck[] c, int indexOld, out int lastIndexCard)
         {
             int valuesCards = 0;
             int tempIndex = indexOld;
@@ -71,12 +71,13 @@ namespace BlackJack
         public Players Name { get; set; }
         private uint NumberOfVictories { get; set; }
         public int NewValueCard { get; set; }
+        
         public bool Answer { get; set; } 
-        public Player(Players name, uint point, int valueCard, bool ans)
+        public Player(Players name, uint point, int value, bool ans)
         {
             Name = name;
             NumberOfVictories = point;
-            NewValueCard = valueCard;
+            NewValueCard = value;
             Answer = ans;
         }
         public void UpdateNumOfVic()
@@ -100,9 +101,9 @@ namespace BlackJack
     {
         static void Main(string[] args)
         {
-            Cards c = new Cards();
+            Deck c = new Deck();
             GameMethods gameMethods = new GameMethods();
-            Cards[] cards = c.Deck();
+            Deck[] cards = c.InitializationDeck();
             Player human = new Player(Players.Player, 0, 0,true);
             Player ai = new Player(Players.Bot_Vanya, 0, 0,true);
 
@@ -112,7 +113,9 @@ namespace BlackJack
                 c.DeckMixed(cards);
                 Console.Clear();
                 int playerCardValue = 0;
-                int aiCardValue = 0; 
+                int aiCardValue = 0;
+                human.Answer = true;
+                ai.Answer = true;
 
                 Console.WriteLine("The deck is ready!\n");
 
@@ -318,21 +321,25 @@ namespace BlackJack
         }
         public bool Question()
         {
-            Console.WriteLine($"Want to get another card?( yes / no)");
-            var temp = Console.ReadLine().ToLower();
-            if (temp == "yes")
+            bool temp = true;
+            do
             {
-                return true;
+                Console.WriteLine($"Want to get another card?( yes / no)");
+                var answer = Console.ReadLine().ToLower();
+                if (answer == "yes")
+                {
+                    temp = false;
+                    return true;
+                }
+                else if (answer == "no")
+                {
+                    temp = false;
+                    return false;
+                }
             }
-            else if (temp == "no")
-            {
-                return false;
-            }
-            else
-            {
-                Console.WriteLine($"Enter( yes / no)");
-                return Question();
-            }
+            while (temp);
+            return false;
+            
         }
         public bool Question(int aiCardValue)
         {
@@ -347,21 +354,25 @@ namespace BlackJack
         }
         public bool RestartGame()
         {
-            Console.WriteLine($"Do you want to start a new game?(Yes / No)");
-            var temp = Console.ReadLine().ToLower();
-            if (temp == "yes")
+            bool temp = true;
+            do
             {
-                return true;
+                Console.WriteLine($"Do you want to start a new game?(Yes / No)");
+                var answer = Console.ReadLine().ToLower();
+                if (answer == "yes")
+                {
+                    temp = false;
+                    return true;
+                }
+                else if (answer == "no")
+                {
+                    temp = false;
+                    return false;
+                }
             }
-            else if (temp == "no")
-            {
-                return false;
-            }
-            else
-            {
-                Console.WriteLine($"Enter( yes / no)");
-                return RestartGame();
-            }
+            while (temp);
+            return false;
+            
         }
     }
 }
