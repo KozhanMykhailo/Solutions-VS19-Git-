@@ -339,17 +339,17 @@ namespace BlackJack
 
         public bool Question()
         {
+            Console.WriteLine($"Want to get another card?( y / n)");
             bool temp = true;
             do
             {
-                Console.WriteLine($"Want to get another card?( yes / no)");
                 var answer = Console.ReadLine().ToLower();
-                if (answer == "yes")
+                if (answer == "y")
                 {
                     temp = false;
                     return true;
                 }
-                else if (answer == "no")
+                else if (answer == "n")
                 {
                     temp = false;
                     return false;
@@ -372,17 +372,17 @@ namespace BlackJack
         }
         public bool RestartGame()
         {
+            Console.WriteLine($"Do you want to start a new game?( Y / N )");
             bool temp = true;
             do
             {
-                Console.WriteLine($"Do you want to start a new game?(Yes / No)");
                 var answer = Console.ReadLine().ToLower();
-                if (answer == "yes")
+                if (answer == "y")
                 {
                     temp = false;
                     return true;
                 }
-                else if (answer == "no")
+                else if (answer != string.Empty)
                 {
                     temp = false;
                     return false;
